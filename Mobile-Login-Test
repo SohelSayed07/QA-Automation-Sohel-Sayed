@@ -1,0 +1,136 @@
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
+import org.openqa.selenium.By;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
+public class Test {
+	
+	private AndroidDriver driver;
+   
+    public static void main(String[] args) {
+        try {
+          
+        	DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+    		desiredCapabilities.setCapability("platformName", "Android");
+    		desiredCapabilities.setCapability("appium:deviceName", "Android");
+    		desiredCapabilities.setCapability("appium:ensureWebviewsHavePages", true);
+    		desiredCapabilities.setCapability("appium:nativeWebScreenshot", true);
+    		desiredCapabilities.setCapability("appium:newCommandTimeout", 3600);
+    		desiredCapabilities.setCapability("appium:connectHardwareKeyboard", true);
+
+    		desiredCapabilities.setCapability("appPackage", "com.winglr.winglr_app");
+    		desiredCapabilities.setCapability("appActivity", "com.winglr.winglr_app.MainActivity");
+
+    		URL remoteUrl = new URL("http://localhost:4723/wd/hub");
+
+    		driver = new AndroidDriver(remoteUrl, desiredCapabilities);;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void testSuccessfulLogin() {
+        String username = "valid_username";
+        String password = "valid_password";
+
+       
+        enterText("username_field_id", username);
+        enterText("password_field_id", password);
+
+        
+        clickElement("login_button_id");
+
+        
+        waitForElement("welcome_message_id");
+        String welcomeMessage = getText("welcome_message_id");
+        assert welcomeMessage.equals("Welcome, User!");
+    }
+
+    private static void testInvalidLogin() {
+        String username = "invalid_username";
+        String password = "invalid_password";
+
+        
+        enterText("username_field_id", username);
+        enterText("password_field_id", password);
+
+        
+        clickElement("login_button_id");
+
+        
+        waitForElement("error_message_id");
+        String errorMessage = getText("error_message_id");
+        assert errorMessage.equals("Invalid username or password");
+
+       
+        String enteredUsername = getText("username_field_id");
+        String enteredPassword = getText("password_field_id");
+        assert enteredUsername.equals(username);
+        assert enteredPassword.equals(password);
+    }
+
+    private static void testLoginButtonState() {
+        
+        assert !isElementEnabled("login_button_id");
+
+        
+        enterText("username_field_id", "valid_username");
+        assert !isElementEnabled("login_button_id");
+
+        
+        enterText("password_field_id", "valid_password");
+
+        
+        assert isElementEnabled("login_button_id");
+    }
+
+    private static void testPasswordRecovery() {
+       
+        clickElement("forgot_password_link_id");
+
+       
+        enterText("recovery_email_field_id", "valid_email@example.com");
+
+        
+        clickElement("recover_password_button_id");
+
+        
+        waitForElement("success_message_id");
+        String successMessage = getText("success_message_id");
+        assert successMessage.equals("Password recovery instructions sent to your email.");
+
+        
+        assert driver.currentActivity().equals("LoginActivity");
+
+       
+        testSuccessfulLogin();
+    }
+
+    private static void enterText(String elementId, String text) {
+        MobileElement element = driver.findElement(By.id(elementId));
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    private static void clickElement(String elementId) {
+        driver.findElement(By.id(elementId)).click();
+    }
+
+    private static void waitForElement(String elementId) {
+        driver.findElement(MobileBy.id(elementId));
+    }
+
+    private static String getText(String elementId) {
+        return driver.findElement(By.id(elementId)).getText();
+    }
+
+    private static boolean isElementEnabled(String elementId) {
+        return driver.findElement(By.id(elementId)).isEnabled();
+    }
+}
