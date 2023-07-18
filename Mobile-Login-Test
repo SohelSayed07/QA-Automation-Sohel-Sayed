@@ -24,8 +24,8 @@ public class Test {
     		desiredCapabilities.setCapability("appium:newCommandTimeout", 3600);
     		desiredCapabilities.setCapability("appium:connectHardwareKeyboard", true);
 
-    		desiredCapabilities.setCapability("appPackage", "com.winglr.winglr_app");
-    		desiredCapabilities.setCapability("appActivity", "com.winglr.winglr_app.MainActivity");
+    		desiredCapabilities.setCapability("appPackage", "com.app");
+    		desiredCapabilities.setCapability("appActivity", "com.app.MainActivity");
 
     		URL remoteUrl = new URL("http://localhost:4723/wd/hub");
 
